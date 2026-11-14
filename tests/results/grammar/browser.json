@@ -1,0 +1,32 @@
+{
+ "engine": "browser analyser (dictionary + rules)",
+ "cases": 130,
+ "casesPassed": 130,
+ "caseAccuracy": 100,
+ "checks": 312,
+ "checksPassed": 312,
+ "checkAccuracy": 100,
+ "wrongButFlagged": 0,
+ "wrongAndCertain": 0,
+ "latencyMs": {
+  "median": 3,
+  "p95": 9.5
+ },
+ "categories": {
+  "noun-gender": "12/12",
+  "case-nominative": "6/6",
+  "case-accusative": "10/10",
+  "case-dative": "10/10",
+  "case-genitive": "6/6",
+  "verb-conjugation": "12/12",
+  "partizip2": "8/8",
+  "praeteritum": "4/4",
+  "auxiliary": "4/4",
+  "separable": "28/28",
+  "reflexive": "5/5",
+  "ambiguous": "12/12",
+  "adjective-declension": "8/8",
+  "comparison": "5/5"
+ },
+ "failures": []
+}

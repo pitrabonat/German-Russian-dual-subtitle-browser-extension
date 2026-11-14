@@ -1,0 +1,9 @@
+# Versions the bundled browser model was exported with (Python 3.14.3, Windows 11).
+torch==2.15.0
+transformers==4.57.6
+optimum==2.1.0
+optimum-onnx==0.1.0
+onnx==1.23.2
+onnxruntime==1.32.0
+sentencepiece==0.2.3
+protobuf==7.36.2

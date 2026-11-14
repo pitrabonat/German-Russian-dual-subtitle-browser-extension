@@ -1,0 +1,51 @@
+{
+ "browser": "opera-gx",
+ "build": "lite",
+ "headless": true,
+ "logicalCores": 8,
+ "date": "2026-11-14T14:18:13.155Z",
+ "baseline": {
+  "processes": 15,
+  "workingSetMb": 981,
+  "privateMb": 528,
+  "cpuSeconds": 8.15625,
+  "largestPrivateMb": [
+   98,
+   78,
+   62
+  ],
+  "at": 1794665900022
+ },
+ "modelLoaded": {
+  "processes": 15,
+  "workingSetMb": 980,
+  "privateMb": 526,
+  "cpuSeconds": 8.1875,
+  "largestPrivateMb": [
+   98,
+   78,
+   62
+  ],
+  "at": 1794665903078
+ },
+ "modelMemoryMb": {
+  "workingSet": -1,
+  "private": -2
+ },
+ "cpuPercentOfAllCores": {
+  "translatingAhead": 0.2,
+  "cachedPlayback": 0.2
+ },
+ "end": {
+  "processes": 15,
+  "workingSetMb": 973,
+  "privateMb": 512,
+  "cpuSeconds": 9.359375,
+  "largestPrivateMb": [
+   95,
+   71,
+   62
+  ],
+  "at": 1794665965963
+ }
+}

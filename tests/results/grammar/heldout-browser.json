@@ -1,0 +1,29 @@
+{
+ "engine": "browser analyser (dictionary + rules)",
+ "set": "heldout",
+ "cases": 44,
+ "casesPassed": 42,
+ "caseAccuracy": 95.5,
+ "checks": 96,
+ "checksPassed": 93,
+ "checkAccuracy": 96.9,
+ "wrongButFlagged": 3,
+ "wrongAndCertain": 0,
+ "latencyMs": {
+  "median": 14.3,
+  "p95": 60.3
+ },
+ "categories": {
+  "noun-gender": "6/6",
+  "case": "10/10",
+  "verb": "8/9",
+  "separable": "12/12",
+  "adjective": "4/5",
+  "ambiguous": "2/2"
+ },
+ "failures": [
+  "h24 [verb] \"Ihr kommt immer zu spät.\" → kommt.person: expected 2, got 2/3 (likely)",
+  "h24 [verb] \"Ihr kommt immer zu spät.\" → kommt.vnumber: expected plural, got singular (uncertain)",
+  "h38 [adjective] \"Sie kauft ein rotes Kleid.\" → rotes.case: expected accusative, got nominative (likely)"
+ ]
+}

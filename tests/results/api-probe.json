@@ -1,0 +1,70 @@
+{
+  "opera-gx": {
+    "exe": "%LOCALAPPDATA%\\Programs\\Opera GX\\139.0.6053.63\\opera.exe",
+    "version": "Chrome/155.0.8059.85",
+    "headless": true,
+    "report": {
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36 OPR/139.0.0.0",
+      "brands": [
+        "Opera GX 139",
+        "Chromium 155",
+        "Not(A:Brand 24"
+      ],
+      "manifestVersion": 3,
+      "sw": {
+        "worker": "undefined",
+        "sharedArrayBuffer": "function",
+        "crossOriginIsolated": false,
+        "gpu": true,
+        "indexedDB": true,
+        "caches": "object",
+        "hardwareConcurrency": 8
+      },
+      "apis": {
+        "storageLocal": true,
+        "storageSync": true,
+        "storageSession": true,
+        "scripting": true,
+        "tabs": true,
+        "getContexts": true,
+        "sidePanel": false
+      },
+      "dnr": {
+        "apiPresent": true,
+        "sessionRuleAccepted": true
+      },
+      "offscreen": {
+        "apiPresent": true,
+        "hasDocumentBefore": false,
+        "created": true,
+        "report": {
+          "crossOriginIsolated": true,
+          "sharedArrayBuffer": "function",
+          "hardwareConcurrency": 8,
+          "deviceMemory": 16,
+          "wasmSimd": true,
+          "worker": {
+            "coi": true,
+            "sab": "function",
+            "gpu": true
+          },
+          "gpu": {
+            "present": true,
+            "vendor": "intel",
+            "architecture": "gen-9",
+            "device": "",
+            "description": "",
+            "f16": true
+          },
+          "translatorApi": "unavailable",
+          "languageDetectorApi": true,
+          "cacheStorage": "object"
+        },
+        "getContexts": 1
+      }
+    }
+  },
+  "edge": {
+    "error": "TargetCloseError: Protocol error (Target.setDiscoverTargets): Target closed"
+  }
+}

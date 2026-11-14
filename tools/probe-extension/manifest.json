@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Mitlesen API probe",
+  "version": "0.0.1",
+  "description": "Reports which extension and web platform APIs are available in this browser.",
+  "permissions": [
+    "offscreen",
+    "storage",
+    "scripting",
+    "activeTab",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "background": {
+    "service_worker": "sw.js",
+    "type": "module"
+  },
+  "cross_origin_embedder_policy": {
+    "value": "require-corp"
+  },
+  "cross_origin_opener_policy": {
+    "value": "same-origin"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

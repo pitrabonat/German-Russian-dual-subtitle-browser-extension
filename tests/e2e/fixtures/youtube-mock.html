@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de" data-mitlesen-adapter="youtube">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mock YouTube player</title>
+    <style>
+      body { margin: 0; background: #0f0f0f; color: #ccc; font: 14px system-ui, sans-serif; }
+      #movie_player { position: relative; width: 960px; height: 540px; margin: 24px auto 0; overflow: hidden; background: linear-gradient(160deg, #39506b 0%, #23303f 45%, #6a5a46 100%); }
+      #movie_player video { width: 100%; height: 100%; }
+      .ytp-caption-window-container { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; }
+      .ytp-caption-segment { padding: 2px 8px; font-size: 22px; color: #fff; background: rgba(8, 8, 8, 0.75); }
+      .ytp-chrome-bottom { position: absolute; left: 12px; right: 12px; bottom: 0; height: 48px; background: rgba(0, 0, 0, 0.5); }
+      .ytp-autohide .ytp-chrome-bottom { display: none; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Stand-in for the YouTube watch page. It reproduces what the adapter relies on:
+      the #movie_player element with the caption option API, the player's own XHR to
+      /api/timedtext, the rendered caption segments, the control bar and the ad class.
+    -->
+    <div id="movie_player" class="html5-video-player ytp-autohide">
+      <video class="html5-main-video" preload="auto" src="silence.wav"></video>
+      <div class="ytp-caption-window-container"></div>
+      <div class="ytp-chrome-bottom"></div>
+    </div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      let videoId = params.get('v') || 'video1';
+      const player = document.getElementById('movie_player');
+      const video = player.querySelector('video');
+      const captions = player.querySelector('.ytp-caption-window-container');
+      const tracksOf = (id) =>
+        id === 'nogerman'
+          ? [{ languageCode: 'en', languageName: 'English', displayName: 'English', kind: '', vss_id: '.en' }]
+          : id === 'nosubs'
+            ? []
+            : [
+                { languageCode: 'en', languageName: 'English', displayName: 'English', kind: '', vss_id: '.en' },
+                { languageCode: 'de', languageName: 'Deutsch', displayName: 'Deutsch', kind: '', vss_id: '.de' },
+                { languageCode: 'de', languageName: 'Deutsch', displayName: 'Deutsch (automatisch erzeugt)', kind: 'asr', vss_id: 'a.de' },
+              ];
+      let current = {};
+      let events = [];
+      window.timedtextRequests = 0;
+
+      function load(track) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `/api/timedtext?v=${videoId}&lang=${track.languageCode}${track.kind === 'asr' ? '&kind=asr' : ''}&fmt=json3&pot=mock`);
+        xhr.onload = () => {
+          window.timedtextRequests++;
+          try { events = JSON.parse(xhr.responseText).events ?? []; } catch { events = []; }
+          render();
+        };
+        xhr.send();
+      }
+      function render() {
+        const t = video.currentTime * 1000;
+        const active = current.languageCode ? events.find((e) => e.segs && t >= e.tStartMs && t < e.tStartMs + (e.dDurationMs ?? 0)) : null;
+        const text = active ? active.segs.map((s) => s.utf8).join('').trim() : '';
+        if (captions.dataset.text === text) return;
+        captions.dataset.text = text;
+        captions.replaceChildren();
+        if (text) {
+          const span = document.createElement('span');
+          span.className = 'ytp-caption-segment';
+          span.textContent = text;
+          captions.append(span);
+        }
+      }
+      video.addEventListener('timeupdate', render);
+
+      player.getOption = (module, option) => (module !== 'captions' ? undefined : option === 'tracklist' ? tracksOf(videoId) : option === 'track' ? current : undefined);
+      player.setOption = (module, option, value) => {
+        if (module !== 'captions' || option !== 'track') return;
+        const next = value && value.languageCode ? tracksOf(videoId).find((t) => t.languageCode === value.languageCode && (t.kind || '') === (value.kind || '')) : null;
+        current = next ?? {};
+        events = [];
+        render();
+        if (next) load(next);
+      };
+      player.loadModule = () => {};
+      player.getVideoData = () => ({ video_id: videoId });
+      player.getPlayerResponse = () => ({ captions: { playerCaptionsTracklistRenderer: { captionTracks: tracksOf(videoId).map((t) => ({ languageCode: t.languageCode, kind: t.kind || undefined, vssId: t.vss_id, name: { simpleText: t.displayName } })) } } });
+
+      // Hooks for the tests.
+      window.mock = {
+        navigate(id) {
+          videoId = id;
+          current = {};
+          events = [];
+          render();
+          video.currentTime = 0;
+          video.dispatchEvent(new Event('emptied'));
+          video.dispatchEvent(new Event('loadedmetadata'));
+          document.dispatchEvent(new CustomEvent('yt-navigate-finish'));
+        },
+        ad(on) { player.classList.toggle('ad-showing', on); },
+        controls(on) { player.classList.toggle('ytp-autohide', !on); },
+        userPicks(languageCode, kind) { player.setOption('captions', 'track', { languageCode, kind }); },
+      };
+    </script>
+  </body>
+</html>

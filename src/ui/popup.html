@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mitlesen</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="top">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="#1d1f26" />
+        <rect x="6" y="9" width="20" height="5" rx="2.5" fill="#fff" />
+        <rect x="9" y="18" width="14" height="5" rx="2.5" fill="#ffd98a" />
+      </svg>
+      <div class="brand">
+        <h1>Mitlesen</h1>
+        <p id="version"></p>
+      </div>
+      <label class="switch big" title="Включить или выключить расширение">
+        <input type="checkbox" id="enabled" />
+        <span></span>
+      </label>
+    </header>
+
+    <main id="main">
+      <section class="card" id="page">
+        <div class="status"><i class="dot" id="pageDot"></i><span id="pageText">Проверяю страницу…</span></div>
+        <p class="hint" id="pageHint" hidden></p>
+        <label class="field" id="trackField" hidden>
+          <span>Дорожка субтитров</span>
+          <select id="track"></select>
+        </label>
+        <div class="row" id="siteButtons" hidden>
+          <button type="button" id="enableSite">Включить на этом сайте</button>
+          <button type="button" class="ghost" id="enableAll">На всех сайтах</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Субтитры</h2>
+        <label class="toggle"><span>Немецкая строка</span><span class="switch"><input type="checkbox" id="showGerman" /><span></span></span></label>
+        <label class="toggle"><span>Русский перевод</span><span class="switch"><input type="checkbox" id="showRussian" /><span></span></span></label>
+        <label class="toggle"><span>Подсказки по словам</span><span class="switch"><input type="checkbox" id="wordPopup" /><span></span></span></label>
+        <label class="toggle"><span>Пауза, пока открыта подсказка</span><span class="switch"><input type="checkbox" id="pauseOnHover" /><span></span></span></label>
+      </section>
+
+      <section class="card">
+        <h2>Вид</h2>
+        <div class="preview" id="preview">
+          <div class="pv-block">
+            <p class="pv-line pv-de"><span>Ich stehe jeden Morgen um sieben auf.</span></p>
+            <p class="pv-line pv-ru"><span>Я встаю каждое утро в семь.</span></p>
+          </div>
+        </div>
+        <label class="slider"><span>Размер текста</span><input type="range" id="fontScale" step="0.1" /><output for="fontScale"></output></label>
+        <label class="slider"><span>Размер перевода</span><input type="range" id="ruScale" step="0.02" /><output for="ruScale"></output></label>
+        <label class="slider"><span>Высота над краем</span><input type="range" id="position" step="1" /><output for="position"></output></label>
+        <label class="slider"><span>Интервал строк</span><input type="range" id="lineGap" step="2" /><output for="lineGap"></output></label>
+        <label class="slider"><span>Плотность фона</span><input type="range" id="bgOpacity" step="0.02" /><output for="bgOpacity"></output></label>
+        <div class="row colors">
+          <label class="color"><input type="color" id="deColor" /><span>Немецкий</span></label>
+          <label class="color"><input type="color" id="ruColor" /><span>Русский</span></label>
+          <button type="button" class="ghost" id="resetLook">Сбросить</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Перевод</h2>
+        <div class="segmented" role="radiogroup" aria-label="Режим перевода">
+          <label><input type="radio" name="mode" value="browser" /><span>В браузере</span></label>
+          <label><input type="radio" name="mode" value="local" /><span>Локальный сервис</span></label>
+        </div>
+        <p class="hint" id="modeHint"></p>
+        <div class="status" id="browserStatus"><i class="dot"></i><span></span></div>
+
+        <div id="localBox" hidden>
+          <label class="field">
+            <span>Чем переводить</span>
+            <select id="localProvider">
+              <option value="local-service">Сервис Mitlesen: OPUS-MT, быстро и точнее</option>
+              <option value="ollama">Ollama: языковая модель, учитывает контекст</option>
+            </select>
+          </label>
+
+          <fieldset id="ollamaBox">
+            <legend>Ollama</legend>
+            <label class="field"><span>Адрес</span><input type="text" id="ollamaEndpoint" spellcheck="false" autocomplete="off" /></label>
+            <label class="field"><span>Модель</span><input type="text" id="ollamaModel" spellcheck="false" autocomplete="off" /></label>
+            <label class="toggle" title="На картах с 4 ГБ памяти Ollama сама оставляет часть модели на процессоре, и ответ идёт в пять раз медленнее"><span>Вся модель на видеокарте</span><span class="switch"><input type="checkbox" id="ollamaFullGpu" /><span></span></span></label>
+            <div class="row"><button type="button" id="checkOllama">Проверить</button><div class="status grow" id="ollamaStatus"><i class="dot"></i><span>не проверялось</span></div></div>
+          </fieldset>
+
+          <fieldset id="serviceBox">
+            <legend>Сервис Mitlesen</legend>
+            <label class="field"><span>Адрес</span><input type="text" id="serviceEndpoint" spellcheck="false" autocomplete="off" /></label>
+            <div class="row"><button type="button" id="checkService">Проверить</button><div class="status grow" id="serviceStatus"><i class="dot"></i><span>не проверялось</span></div></div>
+          </fieldset>
+        </div>
+
+        <label class="slider"><span>Строк контекста</span><input type="range" id="contextSize" step="1" /><output for="contextSize"></output></label>
+        <label class="slider"><span>Перевод наперёд</span><input type="range" id="preloadAhead" step="1" /><output for="preloadAhead"></output></label>
+        <label class="toggle"><span>Склеивать разорванные фразы</span><span class="switch"><input type="checkbox" id="mergeFragments" /><span></span></span></label>
+      </section>
+
+      <details class="card" id="diag">
+        <summary><h2>Данные и диагностика</h2></summary>
+        <div class="kv" id="diagSummary"></div>
+        <table id="diagProviders">
+          <thead><tr><th>Провайдер</th><th>Запросов</th><th>Среднее</th><th>Медиана</th><th>p95</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="hint" id="diagError" hidden></p>
+        <div class="row"><button type="button" class="ghost" id="clearCache">Очистить кэш</button><span class="hint" id="cacheNote"></span></div>
+      </details>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

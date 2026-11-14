@@ -1,0 +1,201 @@
+{
+ "browser": "opera-gx",
+ "headless": true,
+ "date": "2026-11-14T14:14:09.116Z",
+ "passed": 28,
+ "total": 28,
+ "metrics": {
+  "subtitleExtractionMs": 2038,
+  "firstGermanLineMs": 369,
+  "firstTranslationMs": 39132,
+  "modelInitMs": 26688,
+  "preloadedTranslationDelayMs": 0,
+  "cueLatenessAt2xVideoMs": 52,
+  "popupOpenMs": 148,
+  "cachedTranslationDelayMs": 0,
+  "youtubeExtractionMs": 317,
+  "browserModel": {
+   "id": "opus-browser",
+   "requests": 1,
+   "errors": 0,
+   "latency": {
+    "count": 1,
+    "avg": 553,
+    "median": 553,
+    "p95": 553
+   },
+   "initMs": 26688
+  },
+  "analysisLatency": {
+   "count": 4,
+   "avg": 73,
+   "median": 56,
+   "p95": 116
+  },
+  "dictionary": {
+   "entries": 141399,
+   "version": "2026-11-13"
+  }
+ },
+ "results": [
+  {
+   "name": "html5: German track is chosen among several",
+   "ok": true,
+   "ms": 2405,
+   "detail": "ready 2038 ms after navigation"
+  },
+  {
+   "name": "html5: German line appears with interactive words",
+   "ok": true,
+   "ms": 369,
+   "detail": "369 ms after play()"
+  },
+  {
+   "name": "html5: Russian translation arrives from the browser model",
+   "ok": true,
+   "ms": 39140,
+   "detail": "Дом сейчас ремонтируется. | model init 26688 ms"
+  },
+  {
+   "name": "html5: upcoming lines are translated ahead of playback",
+   "ok": true,
+   "ms": 9419,
+   "detail": "translation visible 0 ms after the German line"
+  },
+  {
+   "name": "html5: a sentence split over two cues gets one translation",
+   "ok": true,
+   "ms": 417,
+   "detail": "Вчера вечером я встретила в городе своего старого друга, которого не видела много лет."
+  },
+  {
+   "name": "html5: markup is removed, sound descriptions are not translated",
+   "ok": true,
+   "ms": 618
+  },
+  {
+   "name": "html5: seeking shows the right line and its translation",
+   "ok": true,
+   "ms": 8,
+   "detail": "Дом сейчас ремонтируется."
+  },
+  {
+   "name": "html5: lines stay in sync at double speed",
+   "ok": true,
+   "ms": 503,
+   "detail": "appeared at video time 15.052 s"
+  },
+  {
+   "name": "html5: word panel opens on hover, links the detached prefix, pauses the video",
+   "ok": true,
+   "ms": 665,
+   "detail": "open after 148 ms (includes the 90 ms hover delay)"
+  },
+  {
+   "name": "html5: click pins the panel, Escape closes it",
+   "ok": true,
+   "ms": 921
+  },
+  {
+   "name": "html5: a long line wraps inside the video",
+   "ok": true,
+   "ms": 266,
+   "detail": "block takes 77% of the width"
+  },
+  {
+   "name": "html5: switching the subtitle track",
+   "ok": true,
+   "ms": 133
+  },
+  {
+   "name": "html5: fullscreen of the player wrapper keeps the overlay",
+   "ok": true,
+   "ms": 1559
+  },
+  {
+   "name": "html5: fullscreen of the bare <video> falls back to native cues",
+   "ok": true,
+   "ms": 1513
+  },
+  {
+   "name": "settings: appearance and visibility apply to an open video at once",
+   "ok": true,
+   "ms": 3514
+  },
+  {
+   "name": "cache: a reloaded page gets its translations without the model",
+   "ok": true,
+   "ms": 437,
+   "detail": "15 cached translations, shown 0 ms after the German line"
+  },
+  {
+   "name": "service worker restart: pending and new requests survive",
+   "ok": true,
+   "ms": 1042,
+   "detail": "Поезд опаздывает на 20 минут."
+  },
+  {
+   "name": "missing subtitles are explained",
+   "ok": true,
+   "ms": 399,
+   "detail": "У видео нет текстовых дорожек. Если субтитры видны, сайт рисует их сам, и прочитать их нельзя."
+  },
+  {
+   "name": "youtube: manual German track is requested through the player and intercepted",
+   "ok": true,
+   "ms": 775,
+   "detail": "ready 317 ms after navigation"
+  },
+  {
+   "name": "youtube: the block moves above the player controls",
+   "ok": true,
+   "ms": 7,
+   "detail": "lifted by 15 px"
+  },
+  {
+   "name": "youtube: subtitles are hidden during an advertisement",
+   "ok": true,
+   "ms": 4
+  },
+  {
+   "name": "youtube: navigation to another video replaces the cues",
+   "ok": true,
+   "ms": 236
+  },
+  {
+   "name": "youtube: automatic captions are read as separate lines",
+   "ok": true,
+   "ms": 231,
+   "detail": "30 lines; \"willkommen zum zweiten video\""
+  },
+  {
+   "name": "youtube: choosing another language in the player hands control back",
+   "ok": true,
+   "ms": 219
+  },
+  {
+   "name": "youtube: videos without German or without any subtitles are reported",
+   "ok": true,
+   "ms": 18221,
+   "detail": "Немецкой дорожки нет. Доступны: English."
+  },
+  {
+   "name": "youtube: an empty subtitle response is explained, not ignored",
+   "ok": true,
+   "ms": 14229,
+   "detail": "YouTube ответил на запрос субтитров пустым файлом. Так бывает при блокировщиках "
+  },
+  {
+   "name": "local mode: with Ollama and the service down, the browser model takes over",
+   "ok": true,
+   "ms": 42709,
+   "detail": "{\"opus-browser\":\"ready: WASM, потоков: 4\",\"local-service\":\"unavailable: Локальный сервис не отвечает по адресу http://127.0.0.1:9.\",\"ollama\":\"unavailable: Ollama не отвечает по адресу http://127.0.0.1"
+  },
+  {
+   "name": "model files missing: German subtitles keep working and the reason is shown",
+   "ok": true,
+   "ms": 3075,
+   "detail": "Mitlesen · В эту сборку расширения не включена модель перевода (облегчённый вариант)."
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "mitlesen",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mitlesen: German subtitles with Russian translation and word-level grammar hints for Opera and other Chromium browsers",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch",
+    "package": "node build.mjs --zip",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "dict:fetch": "node data-pipeline/fetch-raw.mjs",
+    "dict:build": "node data-pipeline/build-dict.mjs",
+    "eval:grammar": "node tests/eval/grammar-eval.mjs",
+    "eval:translation": "node tests/eval/translation-eval.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.7",
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.28.2",
+    "fake-indexeddb": "^6.2.8",
+    "puppeteer-core": "^25.17.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

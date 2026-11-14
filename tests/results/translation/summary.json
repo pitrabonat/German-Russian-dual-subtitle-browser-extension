@@ -1,0 +1,220 @@
+[
+ {
+  "run": "ct2-int8-beam1",
+  "provider": "ct2-int8-beam1",
+  "runtime": "CTranslate2 4.9.0, 4 threads, int8",
+  "chrf": 60.71976918437374,
+  "cats": {
+   "everyday": 60.90703456199492,
+   "colloquial": 30.054654152846272,
+   "idiom": 36.41232359518278,
+   "separable": 58.51150737309981,
+   "long": 67.38986510389705,
+   "fragment": 53.287206461458204,
+   "ambiguous": 66.13690668050403,
+   "negation": 67.55416475979938,
+   "modal": 60.15512741966706,
+   "tense": 87.0636186927195,
+   "pronoun": 65.40549379450277
+  },
+  "fragments": {
+   "isolated": 52.85807434332893,
+   "merged": 72.42166253079989,
+   "prefix": 56.90332244487266
+  },
+  "latency": {
+   "avg": 208,
+   "median": 182.9,
+   "p95": 407.4,
+   "max": 604.1
+  },
+  "initMs": 933,
+  "n": 159
+ },
+ {
+  "run": "ct2-int8-beam2",
+  "provider": "ct2-int8-beam2",
+  "runtime": "CTranslate2 4.9.0, 4 threads, int8",
+  "chrf": 63.1303589325573,
+  "cats": {
+   "everyday": 61.67678566138765,
+   "colloquial": 32.82787561498521,
+   "idiom": 32.75268056897318,
+   "separable": 63.613467975059365,
+   "long": 69.07897726634063,
+   "fragment": 56.833793608969465,
+   "ambiguous": 70.51893628746345,
+   "negation": 72.84040003304158,
+   "modal": 65.31003749933707,
+   "tense": 88.25725013160577,
+   "pronoun": 66.50068081219531
+  },
+  "fragments": {
+   "isolated": 55.90180520291934,
+   "merged": 73.56980707588367,
+   "prefix": 61.5258161498081
+  },
+  "latency": {
+   "avg": 228.7,
+   "median": 200.3,
+   "p95": 543.5,
+   "max": 766.4
+  },
+  "initMs": 1119,
+  "n": 159
+ },
+ {
+  "run": "ct2-int8-beam4",
+  "provider": "ct2-int8-beam4",
+  "runtime": "CTranslate2 4.9.0, 4 threads, int8",
+  "chrf": 62.11698418231385,
+  "cats": {
+   "everyday": 60.102478860412994,
+   "colloquial": 31.105015923695476,
+   "idiom": 35.18297100406982,
+   "separable": 62.61173162741104,
+   "long": 67.99553786850261,
+   "fragment": 56.92347385630675,
+   "ambiguous": 66.05648915419071,
+   "negation": 70.46859322343911,
+   "modal": 67.3936137396822,
+   "tense": 85.64212550653292,
+   "pronoun": 67.30742126285212
+  },
+  "fragments": {
+   "isolated": 55.979620505997396,
+   "merged": 70.53101952666681,
+   "prefix": 63.42340707198272
+  },
+  "latency": {
+   "avg": 293.1,
+   "median": 246.7,
+   "p95": 630.8,
+   "max": 970.1
+  },
+  "initMs": 1063,
+  "n": 159
+ },
+ {
+  "run": "onnx-q8-node",
+  "provider": "onnx-q8-node",
+  "runtime": "transformers.js 4.3.2, onnxruntime-node (CPU), greedy decoding",
+  "chrf": 60.02719154445706,
+  "cats": {
+   "everyday": 56.73248629688038,
+   "colloquial": 29.97085737935976,
+   "idiom": 32.55328198825858,
+   "separable": 58.13573947602123,
+   "long": 67.31397799695439,
+   "fragment": 53.05754606934363,
+   "ambiguous": 67.69856124803862,
+   "negation": 65.16929820448208,
+   "modal": 63.964684548959866,
+   "tense": 86.6454787888573,
+   "pronoun": 65.92312667459264
+  },
+  "fragments": {
+   "isolated": 52.664411186672595,
+   "merged": 67.68172274554998
+  },
+  "latency": {
+   "avg": 314,
+   "median": 281,
+   "p95": 661,
+   "max": 818
+  },
+  "initMs": 7062,
+  "n": 159
+ },
+ {
+  "run": "service-ct2-cpu",
+  "provider": "local-service",
+  "runtime": "Mitlesen service 0.1.0, opus-mt-tc-big-de-zle (CTranslate2 int8), cpu (int8, 4 threads), beam 2, over HTTP",
+  "chrf": 63.1303589325573,
+  "cats": {
+   "everyday": 61.67678566138765,
+   "colloquial": 32.82787561498521,
+   "idiom": 32.75268056897318,
+   "separable": 63.613467975059365,
+   "long": 69.07897726634063,
+   "fragment": 56.833793608969465,
+   "ambiguous": 70.51893628746345,
+   "negation": 72.84040003304158,
+   "modal": 65.31003749933707,
+   "tense": 88.25725013160577,
+   "pronoun": 66.50068081219531
+  },
+  "fragments": {
+   "isolated": 55.90180520291934,
+   "merged": 73.56980707588367
+  },
+  "latency": {
+   "avg": 160,
+   "median": 142,
+   "p95": 330,
+   "max": 502
+  },
+  "n": 159
+ },
+ {
+  "run": "service-ct2-gpu",
+  "provider": "local-service",
+  "runtime": "Mitlesen service 0.1.0, opus-mt-tc-big-de-zle (CTranslate2 int8), cuda (int8_float16), beam 2, over HTTP",
+  "chrf": 63.00777158556613,
+  "cats": {
+   "everyday": 62.64001056948651,
+   "colloquial": 32.71667670460828,
+   "idiom": 35.26108400401984,
+   "separable": 61.635752805750116,
+   "long": 67.7904897290142,
+   "fragment": 57.63418425907452,
+   "ambiguous": 66.05648915419071,
+   "negation": 72.40764677962399,
+   "modal": 69.68137840166618,
+   "tense": 89.59255520354903,
+   "pronoun": 65.01816123847381
+  },
+  "fragments": {
+   "isolated": 56.741844761855965,
+   "merged": 73.91063716850805
+  },
+  "latency": {
+   "avg": 66,
+   "median": 60,
+   "p95": 130,
+   "max": 347
+  },
+  "n": 159
+ },
+ {
+  "run": "ollama-qwen3-4b-instruct",
+  "provider": "ollama-qwen3:4b-instruct-fullgpu",
+  "runtime": "Ollama 0.40.16, VRAM 2743 MB of 2743 MB",
+  "chrf": 58.249738860447025,
+  "cats": {
+   "everyday": 67.70366522003116,
+   "colloquial": 39.47043362415612,
+   "idiom": 39.01223830174982,
+   "separable": 56.19976222734282,
+   "long": 59.744108341068475,
+   "fragment": 70.49704896051084,
+   "ambiguous": 59.20446993145297,
+   "negation": 60.268082519780535,
+   "modal": 55.72129006856599,
+   "tense": 69.1668569774984,
+   "pronoun": 50.3041682212935
+  },
+  "fragments": {
+   "isolated": 72.6393017279322,
+   "merged": 65.77888473423691
+  },
+  "latency": {
+   "avg": 557,
+   "median": 513,
+   "p95": 1073,
+   "max": 1454
+  },
+  "initMs": 2675,
+  "n": 159
+ }
+]

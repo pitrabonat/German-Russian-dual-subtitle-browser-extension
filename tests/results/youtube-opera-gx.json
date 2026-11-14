@@ -1,0 +1,43 @@
+{
+ "browser": "opera-gx",
+ "steps": [
+  {
+   "name": "search returns videos",
+   "ok": true,
+   "detail": "https://www.youtube.com/watch?v=A5NgFhzEQjw&pp=ygUWRWFzeSBHZXJtYW4gV29ydHNjaGF0eg%3D%3D"
+  },
+  {
+   "name": "German track found and cues delivered",
+   "ok": true,
+   "detail": "0 cues, track de|, after 9865 ms"
+  },
+  {
+   "name": "German line shown",
+   "ok": false
+  },
+  {
+   "name": "Russian line shown",
+   "ok": false,
+   "detail": "{\"de\":\"\",\"ru\":\"\",\"pending\":false,\"words\":[],\"popOpen\":false,\"popText\":\"\",\"linked\":[],\"chip\":\"\",\"time\":0}"
+  },
+  {
+   "name": "native captions hidden",
+   "ok": false,
+   "detail": "opacity 1"
+  },
+  {
+   "name": "line and translation follow a seek",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "name": "overlay stays inside the fullscreen player",
+   "ok": true,
+   "detail": "{\"fs\":\"movie_player\",\"inside\":true}"
+  },
+  {
+   "name": "a German video was tested end to end",
+   "ok": true
+  }
+ ]
+}

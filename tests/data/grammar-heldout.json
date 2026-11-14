@@ -1,0 +1,54 @@
+{
+  "description": "Held-out grammar cases. They were written after the rules were finished and were never used for tuning, so the score on this file is the honest estimate. Do not fix the engine against single cases of this file; add new cases to grammar-cases.json instead.",
+  "cases": [
+    {"id": "h01", "cat": "noun-gender", "s": "Der Stuhl steht in der Ecke.", "w": "Stuhl", "expect": {"gender": "m", "plural": "Stühle"}},
+    {"id": "h02", "cat": "noun-gender", "s": "Die Blume ist rot.", "w": "Blume", "expect": {"gender": "f", "plural": "Blumen"}},
+    {"id": "h03", "cat": "noun-gender", "s": "Das Fenster ist offen.", "w": "Fenster", "expect": {"gender": "n", "plural": "Fenster"}},
+    {"id": "h04", "cat": "noun-gender", "s": "Der Vogel singt.", "w": "Vogel", "expect": {"gender": "m", "plural": "Vögel"}},
+    {"id": "h05", "cat": "noun-gender", "s": "Die Hand tut weh.", "w": "Hand", "expect": {"gender": "f", "plural": "Hände"}},
+    {"id": "h06", "cat": "noun-gender", "s": "Das Bild hängt an der Wand.", "w": "Bild", "expect": {"gender": "n", "plural": "Bilder"}},
+
+    {"id": "h07", "cat": "case", "s": "Der Lehrer erklärt die Aufgabe.", "w": "Aufgabe", "expect": {"case": "accusative"}},
+    {"id": "h08", "cat": "case", "s": "Ich schreibe meiner Schwester einen Brief.", "w": "Schwester", "expect": {"case": "dative"}},
+    {"id": "h09", "cat": "case", "s": "Ich schreibe meiner Schwester einen Brief.", "w": "Brief", "expect": {"case": "accusative"}},
+    {"id": "h10", "cat": "case", "s": "Das Haus meiner Eltern ist groß.", "w": "Eltern", "expect": {"case": "genitive", "number": "plural"}},
+    {"id": "h11", "cat": "case", "s": "Sie legt das Buch auf den Stuhl.", "w": "Stuhl", "expect": {"case": "accusative"}},
+    {"id": "h12", "cat": "case", "s": "Die Katze sitzt unter dem Tisch.", "w": "Tisch", "expect": {"case": "dative"}},
+    {"id": "h13", "cat": "case", "s": "Ohne seinen Hund geht er nie spazieren.", "w": "Hund", "expect": {"case": "accusative"}},
+    {"id": "h14", "cat": "case", "s": "Am Wochenende besuchen wir unsere Freunde.", "w": "Freunde", "expect": {"lemma": "Freund", "case": "accusative", "number": "plural"}},
+    {"id": "h15", "cat": "case", "s": "Der Bruder meines Freundes wohnt in Köln.", "w": "Freundes", "expect": {"lemma": "Freund", "case": "genitive"}},
+    {"id": "h16", "cat": "case", "s": "Heute scheint die Sonne.", "w": "Sonne", "expect": {"case": "nominative"}},
+
+    {"id": "h17", "cat": "verb", "s": "Sie liest ein Buch.", "w": "liest", "expect": {"lemma": "lesen", "person": "3", "vnumber": "singular"}},
+    {"id": "h18", "cat": "verb", "s": "Wir haben gestern Fußball gespielt.", "w": "gespielt", "expect": {"lemma": "spielen", "tense": "perfect"}},
+    {"id": "h19", "cat": "verb", "s": "Er ist schnell gelaufen.", "w": "gelaufen", "expect": {"lemma": "laufen", "tense": "perfect", "aux": "sein"}},
+    {"id": "h20", "cat": "verb", "s": "Ich konnte gestern nicht kommen.", "w": "konnte", "expect": {"lemma": "können", "tense": "preterite", "role": "modal"}},
+    {"id": "h21", "cat": "verb", "s": "Morgen werden wir früh aufstehen.", "w": "aufstehen", "expect": {"lemma": "aufstehen", "formKind": "infinitive", "tense": "future1", "sep": "auf"}},
+    {"id": "h22", "cat": "verb", "s": "Der Brief wurde gestern geschrieben.", "w": "geschrieben", "expect": {"lemma": "schreiben", "voice": "passive"}},
+    {"id": "h23", "cat": "verb", "s": "Sie nahm den Bus.", "w": "nahm", "expect": {"lemma": "nehmen", "tense": "preterite"}},
+    {"id": "h24", "cat": "verb", "s": "Ihr kommt immer zu spät.", "w": "kommt", "expect": {"lemma": "kommen", "person": "2", "vnumber": "plural"}},
+    {"id": "h25", "cat": "verb", "s": "Er will das Auto verkaufen.", "w": "verkaufen", "expect": {"lemma": "verkaufen", "formKind": "infinitive"}},
+
+    {"id": "h26", "cat": "separable", "s": "Ich mache das Licht aus.", "w": "mache", "expect": {"lemma": "ausmachen", "sep": "aus", "separated": true}},
+    {"id": "h27", "cat": "separable", "s": "Er kommt heute Abend vorbei.", "w": "kommt", "expect": {"lemma": "vorbeikommen", "sep": "vorbei", "separated": true}},
+    {"id": "h28", "cat": "separable", "s": "Sie nimmt an dem Kurs teil.", "w": "nimmt", "expect": {"lemma": "teilnehmen", "sep": "teil", "separated": true}},
+    {"id": "h29", "cat": "separable", "s": "Wir fahren morgen früh ab.", "w": "fahren", "expect": {"lemma": "abfahren", "sep": "ab", "separated": true}},
+    {"id": "h30", "cat": "separable", "s": "Kommst du heute Abend mit?", "w": "Kommst", "expect": {"lemma": "mitkommen", "sep": "mit", "separated": true}},
+    {"id": "h31", "cat": "separable", "s": "Der Zug kommt um acht Uhr an.", "w": "kommt", "expect": {"lemma": "ankommen", "sep": "an", "separated": true}},
+    {"id": "h32", "cat": "separable", "s": "Ich habe das Fenster zugemacht.", "w": "zugemacht", "expect": {"lemma": "zumachen", "formKind": "participle2", "sep": "zu"}},
+    {"id": "h33", "cat": "separable", "s": "Sie steigt in den Bus ein.", "w": "steigt", "expect": {"lemma": "einsteigen", "sep": "ein", "separated": true}},
+    {"id": "h34", "cat": "separable", "s": "Er denkt über das Problem nach.", "w": "denkt", "expect": {"lemma": "nachdenken", "sep": "nach", "separated": true}},
+    {"id": "h35", "cat": "separable", "s": "Ich höre dir zu.", "w": "höre", "expect": {"lemma": "zuhören", "sep": "zu", "separated": true}},
+    {"id": "h36", "cat": "separable", "s": "Sie fährt mit dem Zug.", "w": "fährt", "expect": {"lemma": "fahren"}},
+    {"id": "h37", "cat": "separable", "s": "Ich denke an dich.", "w": "denke", "expect": {"lemma": "denken"}},
+
+    {"id": "h38", "cat": "adjective", "s": "Sie kauft ein rotes Kleid.", "w": "rotes", "expect": {"lemma": "rot", "case": "accusative"}},
+    {"id": "h39", "cat": "adjective", "s": "Mit einem guten Freund ist alles leichter.", "w": "guten", "expect": {"lemma": "gut", "case": "dative"}},
+    {"id": "h40", "cat": "adjective", "s": "Das ist die schönste Stadt.", "w": "schönste", "expect": {"lemma": "schön", "degree": "superlative"}},
+    {"id": "h41", "cat": "adjective", "s": "Dieser Weg ist kürzer.", "w": "kürzer", "expect": {"lemma": "kurz", "degree": "comparative"}},
+    {"id": "h42", "cat": "adjective", "s": "Er hat einen kleinen Bruder.", "w": "kleinen", "expect": {"lemma": "klein", "case": "accusative"}},
+
+    {"id": "h43", "cat": "ambiguous", "s": "Ich lebe in Berlin.", "w": "lebe", "expect": {"pos": "verb", "lemma": "leben"}},
+    {"id": "h44", "cat": "ambiguous", "s": "Das Leben ist schön.", "w": "Leben", "expect": {"pos": "noun", "gender": "n"}}
+  ]
+}

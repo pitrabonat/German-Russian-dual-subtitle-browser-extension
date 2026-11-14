@@ -1,0 +1,13 @@
+node_modules/
+dist/
+release/
+.tmp/
+data/raw/
+data/work/
+models/
+local-service/.venv/
+local-service/models/
+local-service/__pycache__/
+*.log
+# machine-specific npm cache location
+.npmrc

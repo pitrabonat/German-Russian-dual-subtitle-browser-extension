@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mitlesen test player</title>
+    <style>
+      body { margin: 0; background: #0d0f14; color: #ccc; font: 14px system-ui, sans-serif; }
+      .wrap { width: 960px; margin: 24px auto; }
+      /* The media is a silent audio file, so the element gets a picture-like background by hand. */
+      video { display: block; width: 960px; height: 540px; background: linear-gradient(160deg, #39506b 0%, #23303f 45%, #6a5a46 100%); }
+      p { margin: 12px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <video id="v" controls preload="auto" src="silence.wav">
+        <track kind="subtitles" srclang="en" label="English" src="en.vtt" />
+        <track kind="subtitles" srclang="de" label="Deutsch" src="de.vtt" />
+      </video>
+      <p>
+        Testseite: stilles Video mit deutschen und englischen Untertiteln.
+        <button id="fs-wrap" onclick="document.querySelector('.wrap').requestFullscreen()">Vollbild (Rahmen)</button>
+        <button id="fs-video" onclick="document.getElementById('v').requestFullscreen()">Vollbild (Video)</button>
+      </p>
+    </div>
+  </body>
+</html>
