@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="de" data-mitlesen-adapter="netflix">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mock Netflix player</title>
+    <style>
+      body { margin: 0; background: #000; color: #ccc; font: 14px system-ui, sans-serif; }
+      .watch-video { position: relative; width: 960px; height: 540px; margin: 24px auto 0; overflow: hidden; }
+      .watch-video--player-view, video { width: 100%; height: 100%; }
+      video { display: block; background: linear-gradient(160deg, #4b2f2f 0%, #1d1a24 50%, #3b4c5c 100%); }
+      .player-timedtext { position: absolute; left: 0; right: 0; bottom: 60px; text-align: center; pointer-events: none; }
+      .player-timedtext-text-container span { font-size: 26px; color: #fff; text-shadow: 0 0 6px #000; }
+      .watch-video--bottom-controls-container { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: rgba(0, 0, 0, 0.6); }
+      .watch-video--bottom-controls-container.active { height: 72px; }
+    </style>
+  </head>
+  <body>
+    <!--
+      Stand-in for a Netflix title page (/watch/<id>). It reproduces what the adapter relies on:
+      the playback manifest the player reads with JSON.parse (timedtexttracks + ttDownloadables),
+      the .player-timedtext element with the caption Netflix draws, and the bottom control bar.
+      ?mode=broken points the German track at a missing file, so the adapter must fall back to
+      reading the caption from the screen.
+    -->
+    <div class="watch-video">
+      <div class="watch-video--player-view">
+        <video preload="auto" src="/silence.wav"></video>
+        <div class="player-timedtext"><div class="player-timedtext-text-container"><span></span></div></div>
+      </div>
+      <div class="watch-video--bottom-controls-container"></div>
+    </div>
+    <script>
+      const mode = new URLSearchParams(location.search).get('mode') || 'file';
+      const movieId = Number(location.pathname.match(/\/watch\/(\d+)/)[1]);
+      const cdn = location.origin;
+      const manifest = {
+        version: 2,
+        result: {
+          movieId,
+          timedtexttracks: [
+            { isNoneTrack: true, language: 'none', rawTrackType: 'subtitles' },
+            {
+              language: 'en', languageDescription: 'English', rawTrackType: 'subtitles', new_track_id: 'T:en',
+              ttDownloadables: { 'webvtt-lssdh-ios8': { urls: [{ cdn_id: 1, url: `${cdn}/en.vtt` }] } },
+            },
+            {
+              language: 'de', languageDescription: 'Deutsch', rawTrackType: 'subtitles', new_track_id: 'T:de',
+              ttDownloadables: {
+                'dfxp-ls-sdh': { downloadUrls: { 7: `${cdn}/${mode === 'broken' ? 'nf/missing.xml' : 'nf/de.dfxp'}` } },
+                'nflx-cmisc': { isImage: true, downloadUrls: { 7: `${cdn}/nf/image.zip` } },
+              },
+            },
+            {
+              language: 'ja', languageDescription: 'Japanisch', rawTrackType: 'subtitles', new_track_id: 'T:ja',
+              ttDownloadables: { 'nflx-cmisc': { isImage: true, downloadUrls: { 7: `${cdn}/nf/ja.zip` } } },
+            },
+          ],
+        },
+      };
+      // The real player receives this as text and parses it.
+      JSON.parse(JSON.stringify(manifest));
+
+      // Netflix draws the selected caption as page text; here the German one.
+      const video = document.querySelector('video');
+      const line = document.querySelector('.player-timedtext span');
+      let cues = [];
+      fetch('/de.vtt').then((r) => r.text()).then((text) => {
+        for (const m of text.matchAll(/(\d\d):(\d\d):(\d\d)\.(\d{3}) --> (\d\d):(\d\d):(\d\d)\.(\d{3})\r?\n([\s\S]*?)(?:\r?\n\r?\n|$)/g)) {
+          const t = (h, mi, s, f) => (+h * 60 + +mi) * 60 + +s + +f / 1000;
+          cues.push({ start: t(m[1], m[2], m[3], m[4]), end: t(m[5], m[6], m[7], m[8]), text: m[9].replace(/<[^>]+>/g, '').trim() });
+        }
+      });
+      const draw = () => {
+        const now = video.currentTime;
+        const cue = cues.find((c) => now >= c.start && now < c.end);
+        const text = cue ? cue.text : '';
+        if (line.textContent !== text) line.textContent = text;
+        requestAnimationFrame(draw);
+      };
+      requestAnimationFrame(draw);
+      document.addEventListener('mousemove', () => document.querySelector('.watch-video--bottom-controls-container').classList.add('active'));
+    </script>
+  </body>
+</html>

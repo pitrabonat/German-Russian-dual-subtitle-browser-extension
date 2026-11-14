@@ -79,6 +79,23 @@ async function timedText(query) {
   return JSON.stringify(query.get('kind') === 'asr' ? json3Asr(cues) : json3Manual(cues));
 }
 
+// ── mock of the Netflix timed-text CDN: the German file as DFXP with tick times, like Netflix serves it ──
+
+const escapeXml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+async function netflixDfxp() {
+  const cues = parseVtt(await readFile(join(fixtures, 'de.vtt'), 'utf8'));
+  const ticks = (ms) => `${ms * 10000}t`; // tickRate 10 000 000 per second
+  const paragraphs = cues.map(
+    (c, i) => `<p begin="${ticks(c.start)}" end="${ticks(c.end)}" region="region.${i % 2}"><span style="style_0">${escapeXml(plain(c.text)).replace(', ', ',<br/>')}</span></p>`,
+  );
+  return (
+    '<?xml version="1.0" encoding="utf-8"?>\n<tt xmlns:tt="http://www.w3.org/ns/ttml" xmlns="http://www.w3.org/ns/ttml" ' +
+    'xmlns:ttp="http://www.w3.org/ns/ttml#parameter" ttp:tickRate="10000000" xml:lang="de"><head><styling><style xml:id="style_0"/></styling></head>' +
+    `<body><div>${paragraphs.join('\n')}</div></body></tt>`
+  );
+}
+
 /** Starts the server on a free port of the loopback interface. */
 export function startServer() {
   const server = createServer(async (req, res) => {
@@ -90,8 +107,15 @@ export function startServer() {
         res.end(await timedText(url.searchParams));
         return;
       }
-      const body = path === 'silence.wav' ? wav : await readFile(join(fixtures, path || 'player.html'));
-      const type = TYPES[extname(path)] ?? 'application/octet-stream';
+      if (path === 'nf/de.dfxp') {
+        res.writeHead(200, { 'content-type': 'application/ttml+xml; charset=utf-8' });
+        res.end(await netflixDfxp());
+        return;
+      }
+      // Netflix player pages live at /watch/<title id>.
+      const file = /^watch\/\d+$/.test(path) ? 'netflix-mock.html' : path;
+      const body = file === 'silence.wav' ? wav : await readFile(join(fixtures, file || 'player.html'));
+      const type = TYPES[extname(file)] ?? 'application/octet-stream';
       const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range ?? '');
       if (range) {
         const start = Number(range[1]);

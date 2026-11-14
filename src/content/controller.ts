@@ -158,7 +158,10 @@ export class Controller implements AdapterSink, OverlayHost {
 
   onStatus(status: AdapterStatus): void {
     this.status = status;
-    if (status.code === 'no-german' || status.code === 'no-subtitles' || status.code === 'blocked') {
+    // The generic adapter runs on every page with a video: most of those videos have nothing to
+    // do with German, so "no subtitles" is said in the popup only, not over the video.
+    const quiet = this.adapter.id === 'html5' && status.code !== 'blocked';
+    if (!quiet && (status.code === 'no-german' || status.code === 'no-subtitles' || status.code === 'blocked')) {
       const text =
         status.code === 'no-german' ? 'немецких субтитров нет' : status.code === 'no-subtitles' ? 'у видео нет субтитров' : 'текст субтитров недоступен';
       this.overlay.setStatus(text, 'info', 6000);

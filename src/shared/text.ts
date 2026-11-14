@@ -17,7 +17,10 @@ export function normalizeCueText(raw: string): string {
     .replace(/<[^>]*>/g, '')
     .replace(/\{\\[^}]*\}/g, '') // ASS override blocks such as {\an8}
     .replace(/&(?:amp|lt|gt|quot|#39|apos|nbsp);/g, (m) => ENTITIES[m] ?? m)
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replace(/&#(\d{1,7});|&#x([0-9a-f]{1,6});/gi, (m, dec: string | undefined, hex: string | undefined) => {
+      const code = dec !== undefined ? Number(dec) : Number.parseInt(hex ?? '', 16);
+      return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : m;
+    })
     .replace(/[​‎‏﻿]/g, '')
     .replace(/\s+/g, ' ')
     .trim();

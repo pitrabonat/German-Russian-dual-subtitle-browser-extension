@@ -26,18 +26,10 @@
   "permissions": [
     "storage",
     "offscreen",
-    "scripting",
-    "activeTab",
     "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [
-    "*://*.youtube.com/*",
-    "*://*.youtube-nocookie.com/*",
-    "http://127.0.0.1/*",
-    "http://localhost/*"
-  ],
-  "optional_host_permissions": [
-    "*://*/*"
+    "<all_urls>"
   ],
   "content_scripts": [
     {
@@ -54,8 +46,17 @@
     },
     {
       "matches": [
-        "*://*.youtube.com/*",
-        "*://*.youtube-nocookie.com/*"
+        "*://*.netflix.com/*"
+      ],
+      "js": [
+        "netflix-main.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "<all_urls>"
       ],
       "js": [
         "content.js"

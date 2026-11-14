@@ -195,18 +195,15 @@ const PAGE_TEXT: Record<PageState['status']['code'], [Tone, string]> = {
 function showPage(state: PageState | null): void {
   const hint = $('pageHint');
   const trackField = $('trackField');
-  const siteButtons = $('siteButtons');
   hint.hidden = true;
   trackField.hidden = true;
-  siteButtons.hidden = true;
   if (!state) {
     const web = tabUrl !== null && /^https?:$/.test(tabUrl.protocol);
-    setStatus($('page'), '', web ? 'На этом сайте расширение не включено' : 'На этой странице расширение не работает');
-    if (web) {
-      siteButtons.hidden = false;
-      hint.hidden = false;
-      hint.textContent = 'По умолчанию Mitlesen работает только на YouTube. На других сайтах он читает стандартные дорожки субтитров HTML5-видео.';
-    }
+    setStatus($('page'), '', web ? 'На этой странице нет видео' : 'На этой странице расширение не работает');
+    hint.hidden = false;
+    hint.textContent = web
+      ? 'Если видео есть, а страница была открыта до установки расширения, обновите её.'
+      : 'Служебные страницы браузера и магазин расширений закрыты для всех расширений.';
     return;
   }
   const [tone, text] = PAGE_TEXT[state.status.code];
@@ -241,20 +238,6 @@ async function askPage(message: PageRequest): Promise<PageState | null> {
 
 async function refreshPage(): Promise<void> {
   showPage(await askPage({ t: 'page-state' }));
-}
-
-async function enableSite(all: boolean): Promise<void> {
-  if (!tabUrl || tabId === undefined) return;
-  const origin = all ? '*://*' : tabUrl.origin;
-  const granted = await chrome.permissions.request({ origins: [`${origin}/*`] });
-  if (!granted) return;
-  await send({ t: 'register-site', origin });
-  try {
-    await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, files: ['content.js'] });
-  } catch {
-    /* the page will pick the script up on its next load */
-  }
-  setTimeout(() => void refreshPage(), 700);
 }
 
 // ── diagnostics ──
@@ -344,8 +327,6 @@ async function main(): Promise<void> {
   $<HTMLSelectElement>('track').addEventListener('change', (e) => {
     void askPage({ t: 'select-track', id: (e.target as HTMLSelectElement).value }).then(() => setTimeout(() => void refreshPage(), 900));
   });
-  $('enableSite').addEventListener('click', () => void enableSite(false));
-  $('enableAll').addEventListener('click', () => void enableSite(true));
   $('checkOllama').addEventListener('click', (e) => void checkProvider('ollama', settings.ollamaEndpoint, $('ollamaStatus'), e.currentTarget as HTMLButtonElement));
   $('checkService').addEventListener('click', (e) => void checkProvider('local-service', settings.serviceEndpoint, $('serviceStatus'), e.currentTarget as HTMLButtonElement));
   $('clearCache').addEventListener('click', () => {

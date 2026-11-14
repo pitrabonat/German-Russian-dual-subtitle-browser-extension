@@ -46,13 +46,22 @@ export type RuntimeRequest =
   | { t: 'diagnostics' }
   | { t: 'check-provider'; provider: ProviderId }
   | { t: 'clear-cache' }
-  | { t: 'warmup' }
-  | { t: 'register-site'; origin: string }
-  | { t: 'unregister-site'; origin: string };
+  | { t: 'warmup' };
 
 export type RuntimeResponse =
-  | { ok: true; diagnostics?: Diagnostics; status?: ProviderStatus; sites?: string[] }
+  | { ok: true; diagnostics?: Diagnostics; status?: ProviderStatus }
   | { ok: false; error: MitlesenError };
+
+// ── content script → background (one-shot) ──
+
+/** Download of a subtitle file the page announced (Netflix); the background checks the address. */
+export type ContentRequest = { t: 'fetch-subtitles'; url: string };
+
+export type ContentResponse = { ok: true; text: string } | { ok: false; error: MitlesenError };
+
+export function isContentRequest(value: unknown): value is ContentRequest {
+  return isObject(value) && value.t === 'fetch-subtitles' && isShortString(value.url, 4000) && /^https?:\/\//.test(value.url);
+}
 
 // ── popup → content script (one-shot, via tabs.sendMessage) ──
 
@@ -152,10 +161,6 @@ export function isRuntimeRequest(value: unknown): value is RuntimeRequest {
       return true;
     case 'check-provider':
       return typeof value.provider === 'string' && (PROVIDERS as readonly string[]).includes(value.provider);
-    case 'register-site':
-    case 'unregister-site':
-      // Either one origin, or the wildcard that stands for every site.
-      return isShortString(value.origin, 300) && /^(https?:\/\/[^/*]+|\*:\/\/\*)$/.test(value.origin);
     default:
       return false;
   }

@@ -1,36 +1,37 @@
 {
  "browser": "opera-gx",
  "headless": true,
- "date": "2026-11-14T14:14:09.116Z",
- "passed": 28,
- "total": 28,
+ "date": "2026-11-14T19:01:20.271Z",
+ "passed": 32,
+ "total": 32,
  "metrics": {
-  "subtitleExtractionMs": 2038,
-  "firstGermanLineMs": 369,
-  "firstTranslationMs": 39132,
-  "modelInitMs": 26688,
+  "subtitleExtractionMs": 1754,
+  "firstGermanLineMs": 764,
+  "firstTranslationMs": 25011,
+  "modelInitMs": 19265,
   "preloadedTranslationDelayMs": 0,
   "cueLatenessAt2xVideoMs": 52,
-  "popupOpenMs": 148,
+  "popupOpenMs": 137,
   "cachedTranslationDelayMs": 0,
-  "youtubeExtractionMs": 317,
+  "youtubeExtractionMs": 201,
+  "netflixExtractionMs": 211,
   "browserModel": {
    "id": "opus-browser",
-   "requests": 1,
+   "requests": 2,
    "errors": 0,
    "latency": {
-    "count": 1,
-    "avg": 553,
-    "median": 553,
-    "p95": 553
+    "count": 2,
+    "avg": 392,
+    "median": 380,
+    "p95": 403
    },
-   "initMs": 26688
+   "initMs": 19265
   },
   "analysisLatency": {
-   "count": 4,
-   "avg": 73,
-   "median": 56,
-   "p95": 116
+   "count": 6,
+   "avg": 77,
+   "median": 90,
+   "p95": 118
   },
   "dictionary": {
    "entries": 141399,
@@ -41,160 +42,184 @@
   {
    "name": "html5: German track is chosen among several",
    "ok": true,
-   "ms": 2405,
-   "detail": "ready 2038 ms after navigation"
+   "ms": 2168,
+   "detail": "ready 1754 ms after navigation"
   },
   {
    "name": "html5: German line appears with interactive words",
    "ok": true,
-   "ms": 369,
-   "detail": "369 ms after play()"
+   "ms": 764,
+   "detail": "764 ms after play()"
   },
   {
    "name": "html5: Russian translation arrives from the browser model",
    "ok": true,
-   "ms": 39140,
-   "detail": "Дом сейчас ремонтируется. | model init 26688 ms"
+   "ms": 25021,
+   "detail": "Несмотря на то, что весь день шел дождь, мы все равно поехали в горы. | model init 19265 ms"
   },
   {
    "name": "html5: upcoming lines are translated ahead of playback",
    "ok": true,
-   "ms": 9419,
+   "ms": 9416,
    "detail": "translation visible 0 ms after the German line"
   },
   {
    "name": "html5: a sentence split over two cues gets one translation",
    "ok": true,
-   "ms": 417,
+   "ms": 147,
    "detail": "Вчера вечером я встретила в городе своего старого друга, которого не видела много лет."
   },
   {
    "name": "html5: markup is removed, sound descriptions are not translated",
    "ok": true,
-   "ms": 618
+   "ms": 614
   },
   {
    "name": "html5: seeking shows the right line and its translation",
    "ok": true,
-   "ms": 8,
+   "ms": 10,
    "detail": "Дом сейчас ремонтируется."
   },
   {
    "name": "html5: lines stay in sync at double speed",
    "ok": true,
-   "ms": 503,
+   "ms": 490,
    "detail": "appeared at video time 15.052 s"
   },
   {
    "name": "html5: word panel opens on hover, links the detached prefix, pauses the video",
    "ok": true,
-   "ms": 665,
-   "detail": "open after 148 ms (includes the 90 ms hover delay)"
+   "ms": 573,
+   "detail": "open after 137 ms (includes the 90 ms hover delay)"
   },
   {
    "name": "html5: click pins the panel, Escape closes it",
    "ok": true,
-   "ms": 921
+   "ms": 932
   },
   {
    "name": "html5: a long line wraps inside the video",
    "ok": true,
-   "ms": 266,
+   "ms": 258,
    "detail": "block takes 77% of the width"
   },
   {
    "name": "html5: switching the subtitle track",
    "ok": true,
-   "ms": 133
+   "ms": 134
   },
   {
    "name": "html5: fullscreen of the player wrapper keeps the overlay",
    "ok": true,
-   "ms": 1559
+   "ms": 1561
   },
   {
    "name": "html5: fullscreen of the bare <video> falls back to native cues",
    "ok": true,
-   "ms": 1513
+   "ms": 1464
   },
   {
    "name": "settings: appearance and visibility apply to an open video at once",
    "ok": true,
-   "ms": 3514
+   "ms": 2379
   },
   {
    "name": "cache: a reloaded page gets its translations without the model",
    "ok": true,
-   "ms": 437,
+   "ms": 320,
    "detail": "15 cached translations, shown 0 ms after the German line"
   },
   {
    "name": "service worker restart: pending and new requests survive",
    "ok": true,
-   "ms": 1042,
+   "ms": 1038,
    "detail": "Поезд опаздывает на 20 минут."
   },
   {
    "name": "missing subtitles are explained",
    "ok": true,
-   "ms": 399,
-   "detail": "У видео нет текстовых дорожек. Если субтитры видны, сайт рисует их сам, и прочитать их нельзя."
+   "ms": 2803,
+   "detail": "У видео нет текстовых дорожек, и субтитров на экране пока не видно. Если они есть, включите их в плеере."
   },
   {
    "name": "youtube: manual German track is requested through the player and intercepted",
    "ok": true,
-   "ms": 775,
-   "detail": "ready 317 ms after navigation"
+   "ms": 586,
+   "detail": "ready 201 ms after navigation"
   },
   {
    "name": "youtube: the block moves above the player controls",
    "ok": true,
-   "ms": 7,
+   "ms": 4,
    "detail": "lifted by 15 px"
   },
   {
    "name": "youtube: subtitles are hidden during an advertisement",
    "ok": true,
-   "ms": 4
+   "ms": 6
   },
   {
    "name": "youtube: navigation to another video replaces the cues",
    "ok": true,
-   "ms": 236
+   "ms": 228
   },
   {
    "name": "youtube: automatic captions are read as separate lines",
    "ok": true,
-   "ms": 231,
+   "ms": 230,
    "detail": "30 lines; \"willkommen zum zweiten video\""
   },
   {
    "name": "youtube: choosing another language in the player hands control back",
    "ok": true,
-   "ms": 219
+   "ms": 218
   },
   {
    "name": "youtube: videos without German or without any subtitles are reported",
    "ok": true,
-   "ms": 18221,
+   "ms": 17781,
    "detail": "Немецкой дорожки нет. Доступны: English."
   },
   {
    "name": "youtube: an empty subtitle response is explained, not ignored",
    "ok": true,
-   "ms": 14229,
+   "ms": 14398,
    "detail": "YouTube ответил на запрос субтитров пустым файлом. Так бывает при блокировщиках "
+  },
+  {
+   "name": "netflix: the German file from the playback manifest gives the full timeline",
+   "ok": true,
+   "ms": 490,
+   "detail": "ready 211 ms after navigation; lifted 37 px"
+  },
+  {
+   "name": "netflix: a file that fails to load falls back to the caption on screen",
+   "ok": true,
+   "ms": 539,
+   "detail": "текст читается с экрана, без перевода наперёд"
+  },
+  {
+   "name": "any site: German subtitles drawn by a custom player are read from the page",
+   "ok": true,
+   "ms": 4034,
+   "detail": "субтитры читаются с экрана, без перевода наперёд; \"Я позвоню маме.\""
+  },
+  {
+   "name": "any site: captions in another language are left alone",
+   "ok": true,
+   "ms": 8492,
+   "detail": "status no-subtitles"
   },
   {
    "name": "local mode: with Ollama and the service down, the browser model takes over",
    "ok": true,
-   "ms": 42709,
+   "ms": 23959,
    "detail": "{\"opus-browser\":\"ready: WASM, потоков: 4\",\"local-service\":\"unavailable: Локальный сервис не отвечает по адресу http://127.0.0.1:9.\",\"ollama\":\"unavailable: Ollama не отвечает по адресу http://127.0.0.1"
   },
   {
    "name": "model files missing: German subtitles keep working and the reason is shown",
    "ok": true,
-   "ms": 3075,
+   "ms": 2198,
    "detail": "Mitlesen · В эту сборку расширения не включена модель перевода (облегчённый вариант)."
   }
  ]

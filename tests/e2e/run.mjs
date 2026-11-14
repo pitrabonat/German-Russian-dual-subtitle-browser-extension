@@ -47,7 +47,7 @@ async function withSession(options, body) {
     s,
     popup,
     async open(path) {
-      const page = await s.browser.newPage();
+      const page = await s.newPage();
       await page.setViewport({ width: 1280, height: 800 });
       const t = Date.now();
       await page.goto(`${s.server.origin}/${path}`);
@@ -350,9 +350,10 @@ await withSession({ profile: `${browserName}-e2e` }, async (ctx) => {
   await scenario('missing subtitles are explained', async () => {
     const p = await ctx.open('no-subs.html');
     const state = await ctx.waitState((st) => st.status.code === 'no-subtitles', 10000);
-    const o = await waitOverlay(p, (x) => x.chip.length > 0, 5000);
+    // Any page with a video gets the script now, so this is said in the popup, not over the video.
+    const o = await waitOverlay(p, (x) => x.chip.length > 0, 2500);
     await p.close();
-    expect(state?.status.code === 'no-subtitles' && o?.chip.includes('нет субтитров'), `state ${JSON.stringify(state?.status)}, note "${o?.chip}"`);
+    expect(state?.status.code === 'no-subtitles' && !o, `state ${JSON.stringify(state?.status)}, note "${o?.chip}"`);
     return state.status.detail;
   });
 
@@ -440,6 +441,80 @@ await withSession({ profile: `${browserName}-e2e` }, async (ctx) => {
     await p.close();
     expect(state?.status.code === 'blocked' && state.status.detail.includes('пустым'), `status ${JSON.stringify(state?.status)}`);
     return state.status.detail.slice(0, 80);
+  });
+
+  // ── stand-in for the Netflix player ──
+
+  const nativeOpacity = (p, selector) => p.evaluate((sel) => getComputedStyle(document.querySelector(sel)).opacity, selector);
+
+  await scenario('netflix: the German file from the playback manifest gives the full timeline', async () => {
+    const nf = await ctx.open('watch/81234567');
+    const state = await ctx.waitState((st) => st.status.code === 'ready', 20000);
+    metrics.netflixExtractionMs = Date.now() - nf.openedAt;
+    expect(state?.adapter === 'netflix' && state.status.code === 'ready', `status ${JSON.stringify(state?.status)}, adapter ${state?.adapter}`);
+    expect(state.activeTrackId === 'T:de' && state.cueCount === 16 && state.tracks.length === 3, `track ${state.activeTrackId}, cues ${state.cueCount}, tracks ${state.tracks.length}`);
+    await ctx.seek(nf, 2, false);
+    const o = await waitOverlay(nf, (x) => x.de === LINE1 && x.ru.length > 0, 20000);
+    const native = await nativeOpacity(nf, '.player-timedtext');
+    expect(o && native === '0', `line "${(await readOverlay(nf))?.de}", Netflix caption opacity ${native}`);
+    // A line that the DFXP file splits with <br/> arrives as one line.
+    await ctx.seek(nf, 11, false);
+    const split = await waitOverlay(nf, (x) => x.de.startsWith('den ich seit Jahren'), 5000);
+    expect(split?.de === 'den ich seit Jahren nicht gesehen hatte, in der Stadt getroffen.', `line "${split?.de}"`);
+    // The control bar appears on mouse movement; the block moves up.
+    await nf.mouse.move(400, 300);
+    const lifted = await waitOverlay(nf, (x) => x.lift > 0, 3000);
+    expect(lifted, 'block did not move above the control bar');
+    await ctx.seek(nf, 2, false);
+    await waitOverlay(nf, (x) => x.de === LINE1, 3000);
+    await nf.screenshot({ path: join(shotsDir, 'e2e-netflix-mock.png') });
+    await nf.close();
+    return `ready ${metrics.netflixExtractionMs} ms after navigation; lifted ${lifted.lift} px`;
+  });
+
+  await scenario('netflix: a file that fails to load falls back to the caption on screen', async () => {
+    const nf = await ctx.open('watch/81234568?mode=broken');
+    const failed = await ctx.waitState((st) => st.status.code === 'blocked', 20000);
+    expect(failed?.status.code === 'blocked' && failed.status.detail.includes('404'), `status ${JSON.stringify(failed?.status)}`);
+    await ctx.seek(nf, 0.9, true);
+    const o = await waitOverlay(nf, (x) => x.de === LINE1, 8000);
+    const state = await ctx.waitState((st) => st.status.code === 'ready', 5000);
+    const native = await nativeOpacity(nf, '.player-timedtext');
+    await nf.close();
+    expect(o && state?.status.code === 'ready' && native === '0', `line "${o?.de}", status ${JSON.stringify(state?.status)}, Netflix caption opacity ${native}`);
+    return state.status.detail;
+  });
+
+  // ── any other site: a player that draws its subtitles as page text ──
+
+  await scenario('any site: German subtitles drawn by a custom player are read from the page', async () => {
+    const p = await ctx.open('custom-player.html');
+    await ctx.seek(p, 0.9, true);
+    const o = await waitOverlay(p, (x) => x.de === LINE1, 8000);
+    const state = await ctx.waitState((st) => st.status.code === 'ready', 5000);
+    const native = await nativeOpacity(p, '.acme-subtitle-line');
+    const next = await waitOverlay(p, (x) => x.de === 'Dann rufe ich meine Mutter an.' && x.ru.length > 0, 20000);
+    await p.close();
+    expect(o && state?.adapter === 'html5' && state.status.code === 'ready' && native === '0', `line "${o?.de}", status ${JSON.stringify(state?.status)}, site caption opacity ${native}`);
+    expect(next, 'second line or its translation missing');
+    return `${state.status.detail}; "${next.ru}"`;
+  });
+
+  await scenario('any site: captions in another language are left alone', async () => {
+    const p = await ctx.open('custom-player.html?lang=en');
+    await ctx.seek(p, 0.9, true);
+    let shown = '';
+    for (let i = 0; i < 40; i++) {
+      const o = await readOverlay(p);
+      if (o?.de) shown = o.de;
+      await sleep(200);
+    }
+    const native = await nativeOpacity(p, '.acme-subtitle-line');
+    const text = await p.evaluate(() => document.querySelector('.acme-subtitle-line').textContent);
+    const state = await ctx.ask({ t: 'page-state' });
+    await p.close();
+    expect(shown === '' && native === '1' && state?.status.code !== 'ready', `overlay showed "${shown}", site caption opacity ${native} ("${text}"), status ${state?.status.code}`);
+    return `status ${state?.status.code}`;
   });
 
   const d = await ctx.diagnostics();

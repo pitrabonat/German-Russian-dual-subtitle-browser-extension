@@ -37,7 +37,7 @@ const cpuShare = (a, b) => +((100 * (b.cpuSeconds - a.cpuSeconds)) / ((b.at - a.
 const s = await startSession({ browser: browserName, headless, profile: `${browserName}-perf`, extensionPath });
 const report = { browser: browserName, build: tag, headless, logicalCores: cpus().length, date: new Date().toISOString() };
 try {
-  const page = await s.browser.newPage();
+  const page = await s.newPage();
   await page.setViewport({ width: 1280, height: 800 });
   await page.goto(`${s.server.origin}/player.html`);
   await page.waitForSelector('#mitlesen-overlay', { timeout: 20000 });

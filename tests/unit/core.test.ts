@@ -7,7 +7,7 @@ import { looksGerman } from '../../src/content/adapters/types.ts';
 import { buildUnits, contextFor, indexUnitsByCue, isPunctuated } from '../../src/core/context.ts';
 import { Timeline } from '../../src/core/timeline.ts';
 import { equivalents, pickSense, sameRussianWord } from '../../src/nlp/senses.ts';
-import { isClientMessage, isOffscreenRequest, isPageRequest, isRuntimeRequest } from '../../src/shared/messages.ts';
+import { isClientMessage, isContentRequest, isOffscreenRequest, isPageRequest, isRuntimeRequest } from '../../src/shared/messages.ts';
 import { DEFAULT_SETTINGS, isLoopback, normalizeEndpoint, sanitizeSettings } from '../../src/shared/settings.ts';
 import { endsSentence, hashString, isNonSpeech, normalizeCueText, tokenize } from '../../src/shared/text.ts';
 import type { Cue } from '../../src/shared/types';
@@ -229,10 +229,11 @@ describe('message validation', () => {
     expect(isRuntimeRequest({ t: 'diagnostics' })).toBe(true);
     expect(isRuntimeRequest({ t: 'check-provider', provider: 'ollama' })).toBe(true);
     expect(isRuntimeRequest({ t: 'check-provider', provider: 'cloud' })).toBe(false);
-    expect(isRuntimeRequest({ t: 'register-site', origin: 'https://example.org' })).toBe(true);
-    expect(isRuntimeRequest({ t: 'register-site', origin: '*://*' })).toBe(true);
-    expect(isRuntimeRequest({ t: 'register-site', origin: 'https://example.org/path' })).toBe(false);
-    expect(isRuntimeRequest({ t: 'register-site', origin: 'file:///c:/' })).toBe(false);
+    // Sites are no longer registered one by one: the content script runs everywhere.
+    expect(isRuntimeRequest({ t: 'register-site', origin: 'https://example.org' })).toBe(false);
+    expect(isContentRequest({ t: 'fetch-subtitles', url: 'https://ipv4-c001.oca.nflxvideo.net/?o=1&v=5' })).toBe(true);
+    expect(isContentRequest({ t: 'fetch-subtitles', url: 'file:///c:/secret.txt' })).toBe(false);
+    expect(isContentRequest({ t: 'fetch-subtitles', url: `https://a.nflxvideo.net/${'x'.repeat(5000)}` })).toBe(false);
     expect(isPageRequest({ t: 'page-state' })).toBe(true);
     expect(isPageRequest({ t: 'select-track', id: 5 })).toBe(false);
     expect(isOffscreenRequest({ target: 'offscreen', t: 'mt-translate', id: 1, texts: ['a'] })).toBe(true);

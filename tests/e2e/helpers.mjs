@@ -1,32 +1,33 @@
 // Helpers shared by the browser tests.
 import { join } from 'node:path';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 import { launchBrowser, projectRoot, sleep } from './browser.mjs';
 import { startServer } from './server.mjs';
 
 export { sleep };
 export const shotsDir = join(projectRoot, 'tests', 'results', 'screenshots');
 
-/** Launches the browser with the built extension and enables it for the fixture server. */
+/** Launches the browser with the built extension. content.js runs on every site, the fixture server included. */
 export async function startSession({ browser = 'opera-gx', headless = true, profile, extensionPath } = {}) {
   mkdirSync(shotsDir, { recursive: true });
   const server = await startServer();
-  const session = await launchBrowser({ browser, extensionPath: extensionPath ?? join(projectRoot, 'dist'), headless, profile: profile ?? `${browser}-e2e` });
+  const dir = extensionPath ?? join(projectRoot, 'dist');
+  const session = await launchBrowser({ browser, extensionPath: dir, headless, profile: profile ?? `${browser}-e2e` });
   const target = await session.serviceWorkerTarget('background.js', 30000);
   const extensionId = new URL(target.url()).host;
-  const worker = await target.worker();
-  // Same call the popup makes for "Включить на этом сайте"; 127.0.0.1 is already a permitted host.
-  await worker.evaluate(async (origin) => {
-    await chrome.scripting.registerContentScripts([
-      { id: 'e2e', matches: [`${origin}/*`], js: ['content.js'], allFrames: true, runAt: 'document_idle' },
-      // The page-world half of the YouTube adapter, for the mock player page.
-      { id: 'e2e-main', matches: [`${origin}/*`], js: ['youtube-main.js'], allFrames: true, runAt: 'document_start', world: 'MAIN' },
-    ]);
-  }, server.origin);
+  // The page-world halves of the YouTube and Netflix adapters run only on those sites. For the mock
+  // pages they are added through DevTools, before any page script, as the browser does with world: MAIN.
+  const mainWorld = ['youtube-main.js', 'netflix-main.js'].map((f) => readFileSync(join(dir, f), 'utf8'));
   return {
     ...session,
     server,
     extensionId,
+    /** New tab with the page-world scripts in place. */
+    async newPage() {
+      const page = await session.browser.newPage();
+      for (const source of mainWorld) await page.evaluateOnNewDocument(source);
+      return page;
+    },
     async sw(fn, ...args) {
       const t = await session.serviceWorkerTarget('background.js', 30000);
       return (await t.worker()).evaluate(fn, ...args);

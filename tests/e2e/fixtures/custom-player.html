@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Custom player test page</title>
+    <style>
+      body { margin: 0; background: #111; color: #ccc; font: 14px system-ui, sans-serif; }
+      .acme-player { position: relative; width: 960px; height: 540px; margin: 24px auto 0; }
+      video { display: block; width: 100%; height: 100%; background: linear-gradient(160deg, #2f4b3a 0%, #1a2420 50%, #5c533b 100%); }
+      .acme-subtitle-line { position: absolute; left: 0; right: 0; bottom: 64px; text-align: center; font-size: 24px; color: #ff0; pointer-events: none; }
+      .acme-controls { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; background: rgba(0, 0, 0, 0.5); }
+    </style>
+  </head>
+  <body>
+    <!--
+      A player that draws its subtitles itself as page text and has no <track> elements,
+      like most commercial players. ?lang=en draws the English file instead.
+    -->
+    <div class="acme-player">
+      <video preload="auto" src="silence.wav"></video>
+      <div class="acme-subtitle-line"></div>
+      <div class="acme-controls"><button type="button">▶</button></div>
+    </div>
+    <script>
+      const lang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'de';
+      const video = document.querySelector('video');
+      const line = document.querySelector('.acme-subtitle-line');
+      const cues = [];
+      fetch(`${lang}.vtt`).then((r) => r.text()).then((text) => {
+        for (const m of text.matchAll(/(\d\d):(\d\d):(\d\d)\.(\d{3}) --> (\d\d):(\d\d):(\d\d)\.(\d{3})\r?\n([\s\S]*?)(?:\r?\n\r?\n|$)/g)) {
+          const t = (h, mi, s, f) => (+h * 60 + +mi) * 60 + +s + +f / 1000;
+          cues.push({ start: t(m[1], m[2], m[3], m[4]), end: t(m[5], m[6], m[7], m[8]), text: m[9].replace(/<[^>]+>/g, '').trim() });
+        }
+      });
+      const draw = () => {
+        const now = video.currentTime;
+        const cue = cues.find((c) => now >= c.start && now < c.end);
+        const text = cue ? cue.text : '';
+        if (line.textContent !== text) line.textContent = text;
+        requestAnimationFrame(draw);
+      };
+      requestAnimationFrame(draw);
+    </script>
+  </body>
+</html>

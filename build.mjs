@@ -33,6 +33,7 @@ const targets = [
   { ...common, entryPoints: { background: 'src/background/index.ts' }, outdir: dist, format: 'esm' },
   { ...common, entryPoints: { content: 'src/content/index.ts' }, outdir: dist, format: 'iife' },
   { ...common, entryPoints: { 'youtube-main': 'src/inject/youtube-main.ts' }, outdir: dist, format: 'iife' },
+  { ...common, entryPoints: { 'netflix-main': 'src/inject/netflix-main.ts' }, outdir: dist, format: 'iife' },
   { ...common, entryPoints: { popup: 'src/ui/popup.ts' }, outdir: dist, format: 'iife' },
   { ...common, entryPoints: { offscreen: 'src/offscreen/offscreen.ts' }, outdir: dist, format: 'iife' },
   // The model worker pulls in transformers.js; it stays an ES module so onnxruntime can import its glue code.

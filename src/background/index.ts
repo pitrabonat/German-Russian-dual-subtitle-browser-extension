@@ -3,10 +3,12 @@
 import {
   PORT_NAME,
   isClientMessage,
+  isContentRequest,
   isOffscreenEvent,
   isRuntimeRequest,
   makeError,
   toError,
+  type ContentResponse,
   type RuntimeResponse,
   type ServerMessage,
 } from '../shared/messages.ts';
@@ -21,6 +23,7 @@ import type { TranslationProvider } from './translation/provider';
 import { LocalServiceProvider } from './translation/providers/local-service.ts';
 import { OllamaProvider } from './translation/providers/ollama.ts';
 import { OpusBrowserProvider } from './translation/providers/opus-browser.ts';
+import { fetchSubtitles, subtitleUrlAllowed } from './subtitle-fetch.ts';
 
 declare const __VERSION__: string;
 
@@ -256,20 +259,13 @@ async function diagnostics(): Promise<Diagnostics> {
   };
 }
 
-const SITE_SCRIPT_PREFIX = 'site-';
-
-async function registeredSites(): Promise<string[]> {
-  const scripts = await chrome.scripting.getRegisteredContentScripts();
-  return scripts.filter((s) => s.id.startsWith(SITE_SCRIPT_PREFIX)).flatMap((s) => (s.matches ?? []).map((m) => m.replace(/\/\*$/, '')));
-}
-
 async function handleRuntime(message: unknown): Promise<RuntimeResponse> {
   if (!isRuntimeRequest(message)) return { ok: false, error: makeError('internal', 'unknown request') };
   await ready;
   switch (message.t) {
     case 'diagnostics':
       await checkProviders();
-      return { ok: true, diagnostics: await diagnostics(), sites: await registeredSites() };
+      return { ok: true, diagnostics: await diagnostics() };
     case 'check-provider': {
       const provider = ({ 'opus-browser': opusBrowser, 'local-service': localService, ollama } as Record<ProviderId, TranslationProvider>)[message.provider];
       await syncOriginRule();
@@ -283,19 +279,6 @@ async function handleRuntime(message: unknown): Promise<RuntimeResponse> {
     case 'warmup':
       void opusBrowser.warmUp();
       return { ok: true };
-    case 'register-site': {
-      const id = SITE_SCRIPT_PREFIX + hashString(message.origin);
-      const existing = await chrome.scripting.getRegisteredContentScripts({ ids: [id] });
-      if (existing.length === 0) {
-        await chrome.scripting.registerContentScripts([
-          { id, matches: [`${message.origin}/*`], js: ['content.js'], allFrames: true, runAt: 'document_idle', persistAcrossSessions: true },
-        ]);
-      }
-      return { ok: true, sites: await registeredSites() };
-    }
-    case 'unregister-site':
-      await chrome.scripting.unregisterContentScripts({ ids: [SITE_SCRIPT_PREFIX + hashString(message.origin)] }).catch(() => undefined);
-      return { ok: true, sites: await registeredSites() };
   }
 }
 
@@ -305,8 +288,17 @@ chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) =>
     if (message.t === 'mt-progress') opusBrowser.handleProgress(message.progress);
     return undefined;
   }
-  // Content scripts talk through ports; one-shot requests are accepted from extension pages only
-  // (the popup, or the same page opened in a tab), never from a web page's content script.
+  // From our content script in a tab: only the subtitle download, only from allowed addresses.
+  if (sender.tab && isContentRequest(message)) {
+    if (!subtitleUrlAllowed(message.url, sender.url)) {
+      sendResponse({ ok: false, error: makeError('forbidden', 'адрес файла субтитров не разрешён') } satisfies ContentResponse);
+      return undefined;
+    }
+    fetchSubtitles(message.url).then(sendResponse, (e: unknown) => sendResponse({ ok: false, error: toError(e) } satisfies ContentResponse));
+    return true;
+  }
+  // Everything else content scripts do goes through ports; one-shot requests are accepted from
+  // extension pages only (the popup, or the same page opened in a tab).
   const fromExtensionPage = sender.url?.startsWith(`chrome-extension://${chrome.runtime.id}/`) ?? false;
   if (!fromExtensionPage || !isRuntimeRequest(message)) return undefined;
   handleRuntime(message)

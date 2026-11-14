@@ -1,6 +1,8 @@
-// Generic adapter for pages that use the standard <video> element with text tracks.
-import type { Cue, TrackInfo } from '../../shared/types';
+// Generic adapter for any page with a <video>. Reads the standard text tracks when there is a
+// German one; otherwise reads the subtitles the player draws as page text (dom-captions.ts).
+import type { AdapterStatus, Cue, TrackInfo } from '../../shared/types';
 import { normalizeCueText } from '../../shared/text.ts';
+import { GermanCaptionReader } from './dom-captions.ts';
 import { looksGerman, type AdapterSink, type SubtitleAdapter } from './types.ts';
 
 const MAX_CUES = 20_000;
@@ -31,21 +33,21 @@ export class Html5Adapter implements SubtitleAdapter {
   private retryTimers: ReturnType<typeof setTimeout>[] = [];
   private trackElement: HTMLTrackElement | null = null;
   private trackErrorHandler: (() => void) | null = null;
+  private reader: GermanCaptionReader | null = null;
+  private readerVideo: HTMLVideoElement | null = null;
 
   start(sink: AdapterSink): void {
     this.sink = sink;
     sink.onStatus({ code: 'searching' });
     this.scan();
-    // Videos are often inserted later. Only react to mutations that add or remove a <video>.
-    this.domWatcher = new MutationObserver((mutations) => {
-      const relevant = mutations.some((m) =>
-        [...Array.from(m.addedNodes), ...Array.from(m.removedNodes)].some(
-          (n) => n instanceof HTMLElement && (n.tagName === 'VIDEO' || n.querySelector?.('video') !== null),
-        ),
-      );
-      if (!relevant) return;
-      clearTimeout(this.scanTimer);
-      this.scanTimer = setTimeout(() => this.scan(), 300);
+    // Videos are often inserted later. The script runs on every page, so mutations are not
+    // inspected one by one: at most every 400 ms the page is checked for a different main video.
+    this.domWatcher = new MutationObserver(() => {
+      if (this.scanTimer !== undefined) return;
+      this.scanTimer = setTimeout(() => {
+        this.scanTimer = undefined;
+        this.scan();
+      }, 400);
     });
     this.domWatcher.observe(document.documentElement, { childList: true, subtree: true });
   }
@@ -53,6 +55,7 @@ export class Html5Adapter implements SubtitleAdapter {
   stop(): void {
     this.domWatcher?.disconnect();
     clearTimeout(this.scanTimer);
+    this.scanTimer = undefined;
     clearTimeout(this.blockedTimer);
     this.detachVideo();
     this.sink = null;
@@ -65,6 +68,7 @@ export class Html5Adapter implements SubtitleAdapter {
 
   setNativeHidden(hidden: boolean): void {
     this.nativeHidden = hidden;
+    this.reader?.setHidden(hidden);
     if (!this.track) return;
     if (hidden) this.track.mode = 'hidden';
     else this.track.mode = this.originalModes.get(this.track) === 'showing' ? 'showing' : 'hidden';
@@ -97,6 +101,7 @@ export class Html5Adapter implements SubtitleAdapter {
 
   private detachVideo(): void {
     this.releaseTrack();
+    this.stopReader();
     const video = this.video;
     if (!video) return;
     video.textTracks.removeEventListener('addtrack', this.onTrackListChange);
@@ -143,18 +148,16 @@ export class Html5Adapter implements SubtitleAdapter {
     this.sink.onTracks(all.map((t) => t.info), chosen?.info.id ?? null);
     if (all.length === 0) {
       this.releaseTrack();
-      this.sink.onStatus({
-        code: 'no-subtitles',
-        detail: 'У видео нет текстовых дорожек. Если субтитры видны, сайт рисует их сам, и прочитать их нельзя.',
-      });
+      this.startReader({ code: 'no-subtitles', detail: 'У видео нет текстовых дорожек, и субтитров на экране пока не видно. Если они есть, включите их в плеере.' });
       return;
     }
     if (!chosen) {
       this.releaseTrack();
-      this.sink.onStatus({ code: 'no-german', detail: `Немецкой дорожки нет. Доступны: ${all.map((t) => t.info.label).join(', ')}.` });
+      this.startReader({ code: 'no-german', detail: `Немецкой дорожки нет. Доступны: ${all.map((t) => t.info.label).join(', ')}.` });
       return;
     }
     if (chosen.track === this.track) return;
+    this.stopReader();
     this.releaseTrack();
     this.track = chosen.track;
     if (!this.originalModes.has(chosen.track)) this.originalModes.set(chosen.track, chosen.track.mode);
@@ -198,6 +201,42 @@ export class Html5Adapter implements SubtitleAdapter {
     this.track = null;
     this.cueCount = -1;
     clearTimeout(this.blockedTimer);
+  }
+
+  // ── subtitles drawn by the player ──
+
+  /**
+   * Watches the player for subtitle text it renders itself. `fallback` is the status to show
+   * while nothing German has been seen on screen.
+   */
+  private startReader(fallback: AdapterStatus): void {
+    const sink = this.sink;
+    const video = this.video;
+    if (!sink || !video) return;
+    if (this.reader && this.readerVideo === video) {
+      if (!this.reader.german) sink.onStatus(fallback);
+      return;
+    }
+    this.stopReader();
+    this.readerVideo = video;
+    this.reader = new GermanCaptionReader(video, {
+      line: (text) => this.sink?.onLiveLine(text),
+      language: (verdict) =>
+        this.sink?.onStatus(
+          verdict === 'german'
+            ? { code: 'ready', detail: 'субтитры читаются с экрана, без перевода наперёд' }
+            : { code: 'no-german', detail: 'Субтитры на экране не на немецком.' },
+        ),
+    });
+    this.reader.setHidden(this.nativeHidden);
+    this.reader.start();
+    sink.onStatus(fallback);
+  }
+
+  private stopReader(): void {
+    this.reader?.stop();
+    this.reader = null;
+    this.readerVideo = null;
   }
 
   /** Re-reads the cue list when its length changed (streams add cues as they play). */
